@@ -14,7 +14,10 @@ def del_punkt(str_):
 class WikiRevision:
     def __init__(self, page_id=None, revision_id=None, parent_revision_id=None, 
                  text=None, comment=None, title=None, timestamp=None):
-        self.text = text
+        if text:
+            self.text = text.replace('=====', '==').replace('====', '==').replace('===', '==')
+        else:
+            self.text = ''
         self.title = title
         self.comment = comment
         try:
@@ -25,34 +28,47 @@ class WikiRevision:
         self.parent_revision_id = parent_revision_id
         self.revision_id = revision_id
         
-        try:
-            self.parsed_text = wtp.parse(text)
-        except:
-            pass
-        
     def get_plain_text(self):
         return wtp.remove_markup(self.text)
     
     def get_sections(self):
-        sections = [(sec.title, sec.string) for sec in self.parsed_text.sections]
-        return sections
+        any_errors = False
+        try:
+            parsed_text = wtp.parse(self.text)
+            sections = [(sec.title, sec.string) for sec in parsed_text.sections]
+            return sections, any_errors
+        except:
+            any_errors = True
+            return [], any_errors
     
     def get_clean_sections(self):
-        sections = [(sec.title, wtp.remove_markup(sec.string)) for sec in self.parsed_text.sections]
-        return sections
+        any_errors = False
+        try:
+            parsed_text = wtp.parse(self.text)
+            sections = [(sec.title, wtp.remove_markup(sec.string)) for sec in parsed_text.sections]
+            return sections, any_errors
+        except:
+            any_errors = True
+            return [], any_errors
         
     def get_links(self):
         links = []
-        tags = self.parsed_text.get_tags()
-        for tag in tags:
-            title = re.findall(r'title=\s*([^|]+)', tag.string)
-            urls = re.findall(r'url=\s*([^}<|]+)', tag.string)
-            
-            title_str = title[0] if title else ''
-            if urls:
-                for link in urls:
-                    links.append((title_str, link.strip()))
-        return links 
+        any_errors = False
+        try:
+            parsed_text = wtp.parse(self.text)
+            tags = parsed_text.get_tags()
+            for tag in tags:
+                title = re.findall(r'title=\s*([^|]+)', tag.string)
+                urls = re.findall(r'url=\s*([^}<|]+)', tag.string)
+
+                title_str = title[0] if title else ''
+                if urls:
+                    for link in urls:
+                        links.append((title_str, link.strip()))
+            return links, any_errors
+        except:
+            any_errors = True
+            return links, any_errors
     
     def save(self, filepath):
         final_path = f"{filepath}/{self.revision_id}.json"
@@ -101,11 +117,12 @@ class WikiPage:
             revisions[r_id] = new_revision
         return revisions
     
-    def load_revisions(self, filepath):
+    def load_revisions(self, filepath, use_pbar=False):
         revisions = {}
         revisions_nums = os.listdir(filepath)
-        revs = sorted([int(part.split('.json')[0]) for part in revisions_nums])
-        for revision in revs:
+        revs = sorted([int(part.split('.json')[0]) for part in revisions_nums if '.json' in part])
+        pbar_ = tqdm(revs, total=len(revs), position=0, leave=True) if use_pbar else revs
+        for revision in pbar_:
             final_path = f"{filepath}/{revision}.json"
             new_revision = WikiRevision()
             new_revision.load(final_path)
