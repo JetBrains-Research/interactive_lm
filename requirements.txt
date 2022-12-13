@@ -1,0 +1,11 @@
+jsonlines
+pydriller
+langdetect
+mwxml
+wikitextparser
+duckduckgo_search
+transformers
+selenuim
+wandb
+catalyst
+tensorboard
