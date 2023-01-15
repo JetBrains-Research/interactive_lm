@@ -1,6 +1,14 @@
 data/
 wiki/archive
 wiki/data
+wiki/serpsbot-python
+wiki/easse
+wiki/wandb
+wiki/download_with_snippets-*.ipynb
+wiki/enwiki*
+wiki/models
+wiki/data_downloading
 github/archive
 github/data
-**/.ipynb_checkpoints
+**/.ipynb_checkpoint
+s
