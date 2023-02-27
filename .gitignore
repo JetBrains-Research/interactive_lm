@@ -10,5 +10,8 @@ wiki/models
 wiki/data_downloading
 github/archive
 github/data
-**/.ipynb_checkpoint
-s
+*/.ipynb_checkpoints/*
+*/__pycache__/*
+/.ipynb_checkpoints
+*/__pycache__
+wiki/utils/__pycache__

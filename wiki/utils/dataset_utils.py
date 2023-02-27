@@ -142,6 +142,27 @@ class EditDataset(torch.utils.data.Dataset):
         src = self.src_text_tokenized[idx]
         tgt = self.tgt_text_tokenized[idx]
         return src, tgt
+    
+    @staticmethod
+    def collate_fn_new(samples: Tuple[torch.Tensor, torch.Tensor], 
+                   tokenizer: Union[PreTrainedTokenizer, PreTrainedTokenizerFast], 
+                   config: Config) -> Tuple[Tuple[torch.Tensor, torch.Tensor], torch.Tensor]:
+        src_samples = [x[0] for x in samples]
+        tgt_samples = [x[1] for x in samples]
+
+        src_samples = tokenizer.pad(src_samples,
+                                    padding='longest',
+                                    max_length=config.src_max_len,
+                                    return_attention_mask=False,
+                                    return_tensors='pt')['input_ids']
+
+        tgt_samples = tokenizer.pad(tgt_samples,
+                                    padding='longest',
+                                    max_length=config.tgt_max_len,
+                                    return_attention_mask=False,
+                                    return_tensors='pt')['input_ids']
+
+        return (src_samples, tgt_samples), tgt_samples
 
     @staticmethod
     def collate_fn(samples: Tuple[torch.Tensor, torch.Tensor], 
@@ -218,3 +239,4 @@ class ExplainDataset(torch.utils.data.Dataset):
                                     return_tensors='pt')['input_ids']
 
         return (src_samples, tgt_samples), torch.ones(len(samples), 1)
+    
