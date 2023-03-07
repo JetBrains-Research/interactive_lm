@@ -7,6 +7,8 @@ wiki/wandb
 wiki/download_with_snippets-*.ipynb
 wiki/enwiki*
 wiki/models
+wiki/fruit_preprocessing_pipeline/models
+wiki/fruit_preprocessing_pipeline/wandb
 wiki/data_downloading
 github/archive
 github/data
@@ -15,3 +17,8 @@ github/data
 /.ipynb_checkpoints
 */__pycache__
 wiki/utils/__pycache__
+*/models/*
+*/wandb/*
+*/data/*
+*-checkpoint.ipynb
+wiki/fruit_processing/.ipynb_checkpoints
